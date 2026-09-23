@@ -4,9 +4,12 @@ A small web app that reads a sentence and predicts the emotion behind it, using 
 
 The backend is a FastAPI service that loads the model once at startup and exposes a prediction endpoint. The frontend is a single static HTML page served directly by FastAPI, with no build step or frontend framework involved.
 
-![joy](<Screenshot 2026-09-23 152931.png>)
-![sad](<Screenshot 2026-09-23 153033.png>)
-![angry](<Screenshot 2026-09-23 153116.png>)
+<img width="950" height="499" alt="Screenshot 2026-09-23 152931" src="https://github.com/user-attachments/assets/6464d68e-6ee1-4895-a7a6-2a10de701665" />
+
+<img width="944" height="497" alt="Screenshot 2026-09-23 153033" src="https://github.com/user-attachments/assets/29889139-0dd2-4e60-854a-5f2ca26cc0d5" />
+
+<img width="947" height="487" alt="Screenshot 2026-09-23 153116" src="https://github.com/user-attachments/assets/2825f69b-870b-4665-8b4c-473092baf47b" />
+
 
 ## How it works
 
