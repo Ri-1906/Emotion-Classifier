@@ -6,8 +6,7 @@ The backend is a FastAPI service that loads the model once at startup and expose
 
 <img width="950" height="499" alt="joy" src="https://github.com/user-attachments/assets/5d1d1c59-b441-4832-abe0-fc48488d762c" />
 <img width="944" height="497" alt="sad" src="https://github.com/user-attachments/assets/a82a2a78-b6b2-42f0-a493-9642cec28abc" />
-
-
+<img width="947" height="487" alt="angry" src="https://github.com/user-attachments/assets/008fbe18-5c8f-4100-b575-56ba65fff3c9" />
 
 
 
