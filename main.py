@@ -125,9 +125,9 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-@app.get('/')
-def greet():
-    return {"Helloooo!!"}
+# @app.get('/')
+# def greet():
+#     return {"Helloooo!!"}
 
 
 

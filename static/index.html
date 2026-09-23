@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title> — what does this sentence feel like?</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🫧</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+  :root{
+    --bg: #0e0e14;
+    --bg-2: #131320;
+    --surface: #17171f;
+    --line: #26262f;
+    --text: #eceaf0;
+    --muted: #83839a;
+    --faint: #55556a;
+
+    --joy:      #ffc857;
+    --sadness:  #5b7fff;
+    --love:     #ff6b9d;
+    --anger:    #ff5c4d;
+    --fear:     #a07bea;
+    --surprise: #2ee6c8;
+
+    --accent: var(--faint);
+    --accent-soft: rgba(85,85,106,0.18);
+
+    color-scheme: dark;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    position: relative;
+    overflow-x: hidden;
+    transition: background 1.4s ease;
+  }
+
+  /* ambient drifting field, low opacity, subtle */
+  .field{
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .field::before, .field::after{
+    content: '';
+    position: absolute;
+    width: 60vmax;
+    height: 60vmax;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.16;
+    background: var(--accent);
+    transition: background 1.6s ease;
+    will-change: transform;
+  }
+  .field::before{
+    top: -20vmax; left: -15vmax;
+    animation: drift1 34s ease-in-out infinite;
+  }
+  .field::after{
+    bottom: -25vmax; right: -20vmax;
+    animation: drift2 40s ease-in-out infinite;
+  }
+  @keyframes drift1{
+    0%,100%{ transform: translate(0,0) scale(1); }
+    50%{ transform: translate(6vmax, 8vmax) scale(1.12); }
+  }
+  @keyframes drift2{
+    0%,100%{ transform: translate(0,0) scale(1); }
+    50%{ transform: translate(-7vmax, -5vmax) scale(1.08); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .field::before, .field::after{ animation: none; }
+  }
+
+  .wrap{
+    position: relative;
+    z-index: 1;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 6vh 24px 10vh;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 9vh;
+  }
+  .mark{
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.01em;
+    color: var(--text);
+  }
+  .status{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .status .dot{
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--faint);
+    transition: background 0.4s ease;
+  }
+  .status .dot.ready{ background: #4ade80; }
+  .status .dot.down{ background: #f87171; }
+
+  main{ flex: 1; }
+
+  h1{
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(2.2rem, 6vw, 3.2rem);
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    margin: 0 0 3.5rem;
+    max-width: 12ch;
+  }
+
+  .field-group{
+    position: relative;
+    margin-bottom: 2rem;
+  }
+
+  textarea{
+    width: 100%;
+    resize: none;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--line);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 1.15rem;
+    line-height: 1.55;
+    padding: 0 0 1rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+    min-height: 3.4rem;
+  }
+  textarea::placeholder{ color: var(--faint); }
+  textarea:focus{ border-color: var(--accent); }
+
+  .field-foot{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.6rem;
+  }
+  .counter{
+    font-size: 0.78rem;
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  button.go{
+    appearance: none;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: border-color 0.25s ease, background 0.25s ease, transform 0.15s ease;
+  }
+  button.go:hover:not(:disabled){
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  button.go:active:not(:disabled){ transform: scale(0.97); }
+  button.go:disabled{ opacity: 0.5; cursor: default; }
+  button.go:focus-visible, textarea:focus-visible{
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .hint{
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin: -1.4rem 0 3rem;
+    min-height: 1.2em;
+  }
+  .hint.error{ color: var(--anger); }
+
+  /* result */
+  .result{
+    border-top: 1px solid var(--line);
+    padding-top: 2.6rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    pointer-events: none;
+  }
+  .result.show{
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .headline{
+    display: flex;
+    align-items: baseline;
+    gap: 0.9rem;
+    margin-bottom: 2.2rem;
+    flex-wrap: wrap;
+  }
+  .headline .emoji{ font-size: 2.1rem; line-height: 1; }
+  .headline .label{
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 2rem;
+    color: var(--accent);
+    transition: color 1.2s ease;
+  }
+  .headline .conf{
+    font-size: 0.95rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .spectrum{ display: flex; flex-direction: column; gap: 0.85rem; }
+  .row{
+    display: grid;
+    grid-template-columns: 90px 1fr 46px;
+    align-items: center;
+    gap: 14px;
+  }
+  .row .name{
+    font-size: 0.86rem;
+    color: var(--muted);
+    text-transform: capitalize;
+  }
+  .row .track{
+    height: 6px;
+    background: var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .row .fill{
+    height: 100%;
+    width: 0%;
+    border-radius: 4px;
+    background: var(--faint);
+    transition: width 0.9s cubic-bezier(.2,.8,.2,1), background 1s ease;
+  }
+  .row .pct{
+    font-size: 0.8rem;
+    color: var(--faint);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  footer{
+    margin-top: 6vh;
+    font-size: 0.78rem;
+    color: var(--faint);
+    text-align: center;
+  }
+
+  @media (max-width: 460px){
+    .row{ grid-template-columns: 74px 1fr 40px; gap: 10px; }
+    h1{ margin-bottom: 2.6rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="field" aria-hidden="true"></div>
+
+<div class="wrap">
+  <header>
+    <span class="mark">Lexicon</span>
+    <span class="status" id="status">
+      <span class="dot" id="statusDot"></span>
+      <span id="statusText">connecting</span>
+    </span>
+  </header>
+
+  <main>
+    <h1>What does this sentence feel like?</h1>
+
+    <div class="field-group">
+      <textarea
+        id="input"
+        rows="2"
+        maxlength="2000"
+        placeholder="Type or paste a sentence, then see what it's carrying."
+      ></textarea>
+      <div class="field-foot">
+        <span class="counter"><span id="count">0</span>/2000</span>
+        <button class="go" id="submit" disabled>Read the feeling</button>
+      </div>
+    </div>
+    <div class="hint" id="hint"></div>
+
+    <section class="result" id="result" aria-live="polite">
+      <div class="headline">
+        <span class="emoji" id="rEmoji">—</span>
+        <span class="label" id="rLabel">—</span>
+        <span class="conf" id="rConf"></span>
+      </div>
+      <div class="spectrum" id="spectrum"></div>
+    </section>
+  </main>
+
+  <footer>Analyzed locally by a BiGRU model — nothing is stored.</footer>
+</div>
+
+<script>
+(function(){
+  const EMOJI = {
+    sadness: '😢', joy: '😀', love: '❤️',
+    anger: '😠', fear: '😨', surprise: '😮'
+  };
+  const COLORVAR = {
+    sadness: '--sadness', joy: '--joy', love: '--love',
+    anger: '--anger', fear: '--fear', surprise: '--surprise'
+  };
+
+  const input = document.getElementById('input');
+  const count = document.getElementById('count');
+  const submit = document.getElementById('submit');
+  const hint = document.getElementById('hint');
+  const result = document.getElementById('result');
+  const spectrum = document.getElementById('spectrum');
+  const rEmoji = document.getElementById('rEmoji');
+  const rLabel = document.getElementById('rLabel');
+  const rConf = document.getElementById('rConf');
+  const statusDot = document.getElementById('statusDot');
+  const statusText = document.getElementById('statusText');
+  const root = document.documentElement;
+
+  function autosize(){
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 260) + 'px';
+  }
+
+  input.addEventListener('input', () => {
+    const len = input.value.length;
+    count.textContent = len;
+    submit.disabled = len === 0;
+    autosize();
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && !submit.disabled){
+      analyze();
+    }
+  });
+
+  submit.addEventListener('click', analyze);
+
+  async function checkHealth(){
+    try{
+      const res = await fetch('/health');
+      if (!res.ok) throw new Error('down');
+      const data = await res.json();
+      if (data.model_loaded){
+        statusDot.className = 'dot ready';
+        statusText.textContent = 'ready';
+      } else {
+        statusDot.className = 'dot';
+        statusText.textContent = 'loading model';
+        setTimeout(checkHealth, 2500);
+      }
+    } catch(e){
+      statusDot.className = 'dot down';
+      statusText.textContent = 'offline';
+      setTimeout(checkHealth, 4000);
+    }
+  }
+
+  function setHint(msg, isError){
+    hint.textContent = msg || '';
+    hint.classList.toggle('error', !!isError);
+  }
+
+  async function analyze(){
+    const text = input.value.trim();
+    if (!text) return;
+
+    submit.disabled = true;
+    const original = submit.textContent;
+    submit.textContent = 'Reading…';
+    setHint('');
+
+    try{
+      const res = await fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+
+      if (res.status === 503){
+        setHint("The model isn't awake yet — give it a moment and try again.", true);
+        return;
+      }
+      if (!res.ok){
+        const body = await res.json().catch(() => ({}));
+        setHint(body.detail || "Couldn't read that sentence. Try again.", true);
+        return;
+      }
+
+      const data = await res.json();
+      render(data);
+
+    } catch(err){
+      setHint("Couldn't reach the server. Check your connection and try again.", true);
+    } finally {
+      submit.disabled = input.value.length === 0;
+      submit.textContent = original;
+    }
+  }
+
+  function render(data){
+    const dominant = data.predicted_emotion;
+    const varName = COLORVAR[dominant];
+    const dominantColor = getComputedStyle(root).getPropertyValue(varName).trim();
+
+    // orchestrated tint shift
+    root.style.setProperty('--accent', dominantColor);
+    root.style.setProperty('--accent-soft', hexToSoft(dominantColor));
+
+    rEmoji.textContent = EMOJI[dominant] || '—';
+    rLabel.textContent = dominant;
+    rConf.textContent = Math.round(data.confidence * 100) + '% confident';
+
+    const entries = Object.entries(data.all_prob).sort((a,b) => b[1]-a[1]);
+
+    spectrum.innerHTML = '';
+    entries.forEach(([name, prob], i) => {
+      const pct = Math.round(prob * 100);
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.innerHTML = `
+        <span class="name">${name}</span>
+        <span class="track"><span class="fill" id="fill-${name}"></span></span>
+        <span class="pct">${pct}%</span>
+      `;
+      spectrum.appendChild(row);
+    });
+
+    result.classList.add('show');
+
+    // trigger width transition after paint, staggered slightly
+    requestAnimationFrame(() => {
+      entries.forEach(([name, prob], i) => {
+        setTimeout(() => {
+          const fillEl = document.getElementById('fill-' + name);
+          if (!fillEl) return;
+          fillEl.style.width = Math.round(prob * 100) + '%';
+          fillEl.style.background = getComputedStyle(root).getPropertyValue(COLORVAR[name]).trim();
+        }, i * 40);
+      });
+    });
+
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function hexToSoft(hex){
+    hex = hex.replace('#','').trim();
+    if (hex.length !== 6) return 'rgba(120,120,140,0.18)';
+    const r = parseInt(hex.slice(0,2),16);
+    const g = parseInt(hex.slice(2,4),16);
+    const b = parseInt(hex.slice(4,6),16);
+    return `rgba(${r},${g},${b},0.16)`;
+  }
+
+  checkHealth();
+  autosize();
+})();
+</script>
+
+</body>
+</html>
